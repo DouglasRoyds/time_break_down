@@ -1,13 +1,16 @@
 #!/usr/bin/make
-# A
+# An install-only makefile to allow easy running of checkinstall.
 
+PACKAGE = time-break-down
 prefix = /usr/local
 exec_prefix = $(prefix)
 bindir = $(exec_prefix)/bin
+datarootdir = $(prefix)/share
+docdir = $(datarootdir)/doc/$(PACKAGE)
 DESTDIR = /
 
 scriptfiles = $(wildcard add_* analyse_* edit_* print_* time_break_down_*)
-$(info scriptfiles = $(scriptfiles))
+docfiles = $(wildcard *.md)
 
 all:
 	@echo "Nothing to do"
@@ -16,15 +19,10 @@ all:
 
 install:
 	@install -d $(DESTDIR)$(bindir)
+	@install -d $(DESTDIR)$(docdir)
 	@install -v -m775 $(scriptfiles) $(DESTDIR)$(bindir)
-
-uninstall:
-	for file in $(scriptfiles); do \
-	   echo $(DESTDIR)$(bindir)$$file; \
-	   rm -vf $(DESTDIR)$(bindir)$$file; \
-	done
-	rmdir -v $(DESTDIR)$(bindir) || true
+	@install -v -m664 $(docfiles) $(DESTDIR)$(docdir)
 
 checkinstall:
-	sudo checkinstall --pkgname=time-break-down
+	sudo checkinstall --pkgname=$(PACKAGE) --nodoc
 
