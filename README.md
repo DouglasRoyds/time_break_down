@@ -1,6 +1,3 @@
-Time break down analysis
-========================
-
 A set of scripts to record daily time usage in plain text files (tab-separated), and to analyse the records.
 
 The input-file format is:
