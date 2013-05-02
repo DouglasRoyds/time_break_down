@@ -12,10 +12,11 @@ DESTDIR = /
 scriptfiles = $(wildcard add_* analyse_* edit_* print_* time_break_down_*)
 docfiles = $(wildcard *.md)
 
-all:
-	@echo "Nothing to do"
-	@echo "You probably meant to type"
+help:
+	@echo "An install-only makefile to allow easy running of checkinstall:"
 	@echo "   $$ sudo make checkinstall"
+	@echo "Installs the following scripts:"
+	@echo -n "   "; echo $(scriptfiles) | sed 's# \+#\n   #g'
 
 install:
 	@install -d $(DESTDIR)$(bindir)
