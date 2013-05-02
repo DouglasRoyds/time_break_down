@@ -1,0 +1,12 @@
+#!/bin/bash
+# Pipe one or more Time_break_down.txt files into me
+
+# C-locale to get case-sensitive sort
+export LC_ALL=C
+
+time_break_down_task_times \
+   | sort -t"$(echo -e '\t')" -k4 -k3 -k2 \
+   | time_break_down_task_summaries \
+   | sort -t"$(echo -e '\t')" -k4 -k3 -k1nr \
+   | time_break_down_group_by_task
+

@@ -1,0 +1,71 @@
+#!/bin/bash
+
+if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
+   echo "//homehost/roydsd not mounted"
+   exit 1
+fi
+
+cd /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/
+
+echo "------------------- Today -------------------------------------"
+
+analyse_daily_hours < Time_break-down.txt
+echo
+grep $(date +%x) -A999 Time_break-down.txt | analyse_time_break_down
+echo
+
+echo "------------------- Last working day --------------------------"
+
+last_days_files="$(ls -t Archive/$(date +'%Y')/* | head -1) \
+                         Time_break-down.txt"
+
+yesterday=$(cat $last_days_files \
+            | gawk  'BEGIN {
+                        today = strftime("%x")
+                     }
+                     ($0 ~ today) {
+                        # Looking for yesterdays date
+                        # Print all lines up to but not including today
+                        exit
+                     }
+                     {print}
+                     ' \
+            | egrep -o '[0-9]+/[0-9]+/[0-9]+' \
+            | tail -n1 \
+            )
+
+last_timestamp_yesterday=$(cat $last_days_files \
+                              | grep -A999 "${yesterday}" \
+                              | gawk  'BEGIN { now = strftime("%R") }
+                                       ($1 > now) { print last_timestamp_yesterday; exit }
+                                       ($1 != "") { last_timestamp_yesterday = $1 }
+                                       ' \
+                           )
+
+# Print yesterday's date line, so that the analysis has a date to start on,
+# with the time-stamp set to that of the first task in the last 24 hours.
+# Print the remaining entries from the last 24 hours,
+# but remove the first one, as that will have exactly the same start-time as yesterday's date line
+(
+   cat $last_days_files \
+      | grep "${yesterday}" \
+      | sed "s#^[0-9]\+:[0-9]\+#${last_timestamp_yesterday}#"
+   cat $last_days_files \
+      | grep -A9999 "${yesterday}" \
+      | grep -A9999 "^${last_timestamp_yesterday}" \
+      | tail -n+2
+) | analyse_time_break_down
+echo
+
+echo "------------------- Week so far -------------------------------"
+
+analyse_time_break_down < Time_break-down.txt 
+echo
+
+echo "------------------- Year so far -------------------------------"
+
+cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Archive/$(date +'%Y')/* \
+    /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt \
+    | analyse_time_break_down
+echo
+

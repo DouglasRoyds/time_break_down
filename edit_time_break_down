@@ -1,0 +1,19 @@
+#!/bin/bash
+
+mountdir="/mnt/homehost/roydsd"
+breakdown_file="$mountdir/Tait/Hours_and_time-sheets/Time_break-down.txt"
+breakdown_dir=$(dirname "$breakdown_file")
+
+if ! grep "$mountdir" <(mount) >/dev/null; then
+   echo "$mountdir not mounted" | less
+   exit 1
+fi
+
+if timeout3 -t9 sh -c "date -d @$(expr \( $(date +%s) + 150 \) / 300 \* 300) '+%H:%M%t%x' >> $breakdown_file"
+then
+   cd "$breakdown_dir"
+   vim -c 'set noexpandtab hlsearch tabstop=8 softtabstop=0' "$breakdown_file"
+else
+   echo "Unable to write $breakdown_file" | less
+fi
+

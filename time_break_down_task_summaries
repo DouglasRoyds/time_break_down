@@ -1,0 +1,110 @@
+#!/usr/bin/gawk -f
+
+#------------------------------------ Initialisation ------------------------------------------------------------------
+
+BEGIN {
+   FS = "\t"
+   OFS = "\t"
+   TIME = 1
+   SUBTASK = 2
+   TASK = 3
+   PROJECT = 4
+   DATE = 5
+
+   TRUE = 1
+   FALSE = 0
+   error_number = 0
+
+   first_line = TRUE
+   subtask_time = 0
+   total_time = 0
+}
+
+#------------------------------------ Line processing -----------------------------------------------------------------
+
+(first_line == TRUE) {
+                                    #print "First line"
+   new_subtask()
+   new_project()
+   new_task()
+   first_line = FALSE
+}
+
+(project != $PROJECT) {
+                                    #print "New project: " $PROJECT
+                                    #print
+   new_subtask()
+   new_project()
+   new_task()
+   increment_totals()
+   next
+}
+
+(task != $TASK) {
+                                    #print "New task: " $TASK
+   new_subtask()
+   new_task()
+   increment_totals()
+   next
+}
+
+(subtask != $SUBTASK) {
+                                    #print "New subtask: " $SUBTASK
+   new_subtask()
+   increment_totals()
+   next
+}
+
+{
+   increment_totals()
+}
+
+END {
+   new_subtask()
+                                    #printf "Total: %6s\n", hours_minutes(total_time)
+}
+
+#------------------------------------ Functions -----------------------------------------------------------------------
+
+function increment_totals() {
+   subtask_time += $TIME
+   total_time += $TIME
+}
+
+function new_project() {
+   project = $PROJECT
+}
+
+function new_task() {
+   task = $TASK
+}
+
+function new_subtask() {
+   if (first_line == FALSE) {
+      printf "%s\t%s\n", subtask_time, subtask_line
+   }
+   subtask_line = sprintf("%s\t%s\t%s", $SUBTASK, $TASK, $PROJECT)
+   subtask = $SUBTASK
+   subtask_time = 0
+}
+
+function hours_minutes(minutes) {
+   hours = int(minutes / 60)
+   minutes = minutes - (hours * 60)
+   return sprintf("%2i:%02i", hours, minutes)
+}
+
+#------------------------------------ Error handling ------------------------------------------------------------------
+
+function error(error_message) {
+   print "Line " FNR ": " error_message
+   error_number = 1
+   exit error_number
+}
+
+END {
+   if (error_number > 0) {
+      exit error_number
+   }
+}
+

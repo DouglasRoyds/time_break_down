@@ -1,0 +1,229 @@
+#!/usr/bin/gawk -f
+
+#------------------------------------ Initialisation ------------------------------------------------------------------
+
+BEGIN {
+   go_home_time = "18:00"
+   unplanned_tasks = "assist spec support admin mail planning computer supervision training reading procs stuff"
+
+   FS = "\t"
+   TIME = 1
+   SUBTASK = 2
+   TASK = 3
+   PROJECT = 4
+   DATE = 5
+
+   TRUE = 1
+   FALSE = 0
+
+   week_total = 0          # Total hours (ie. 40)
+   week_active_total = 0   # Hours excluding whole-day leave, whole-day training
+   week_project_total = 0
+   week_planned_total = 0
+   start_time = "00:00"
+   error_number = 0
+}
+
+#------------------------------------ Line processing -----------------------------------------------------------------
+
+# Ignore the .LOG line
+/\.LOG/ {
+   next
+}
+
+# Ignore blank lines
+/^$/ {
+   print "Blank line"
+   next
+}
+
+# Ignore lines with no time entry - that is, lines starting with a tab
+/^\t/ {
+   print "Line with no time entry: " $0
+   next
+}
+
+{
+   # TODO: Add a time-going-backwards check here
+   task_time = minutes_between(start_time, $TIME)
+   start_time = $TIME
+   time_of_last_entry = $TIME
+                                             #print
+}
+
+# New day
+$DATE != "" {
+   week_total += day_total
+   if (day_project_total > 0) {
+      week_active_total += day_total
+   }
+   if (day_total > 0) {
+      print_day_total()
+   }
+                                             #print "New day"
+   date = $DATE
+   day_total = 0
+   day_project_total = 0
+   day_planned_total = 0
+   working_spell = 0
+   project_start = $TIME
+   next
+}
+
+# Non-Tait time
+$TASK == "" {
+                                             #print "Non-Tait time"
+   print_working_spell()
+   next
+}
+
+{
+   day_total += task_time
+}
+
+# Non-project time
+$PROJECT == "" {
+                                             #print "Non-project time"
+   print_working_spell()
+   next
+}
+
+# Project time
+{
+   working_spell += task_time
+   working_spell_end = $TIME
+   day_project_total += task_time
+   week_project_total += task_time
+   # Falling through
+}
+
+# Planned task
+(! index(unplanned_tasks, $TASK)) {
+                                             #print "Planned project time"
+   day_planned_total += task_time
+   week_planned_total += task_time
+   next
+}
+
+END {
+   week_total += day_total
+   if (day_project_total > 0) {
+      week_active_total += day_total
+   }
+}
+
+#------------------------------------ Functions -----------------------------------------------------------------------
+
+function minutes_between(start_time, end_time) {
+   if (split(start_time, start, ":") != 2) {
+      error("Not a valid time: " start_time)
+   }
+   if (split(end_time, end, ":") != 2) {
+      error("Not a valid time: " end_time)
+   }
+
+   hours = end[1] - start[1]
+   minutes = end[2] - start [2]
+   if (minutes < 0) {
+      minutes = minutes + 60
+      hours = hours - 1
+   }
+   total = hours * 60 + minutes
+   #print "Hours: " hours "  Minutes: " minutes "  Total: " total
+   return total
+}
+
+#------------------------------------ Output calculations and formatting ----------------------------------------------
+
+function hours_minutes(minutes) {
+   hours = int(minutes / 60)
+   minutes = minutes - (hours * 60)
+   return sprintf("%2i:%02i", hours, minutes)
+}
+
+function print_working_spell() {
+   if (strftime("%x") == date) {
+      # We're working on today
+      if (working_spell > 0) {
+         if (!have_printed_working_spell_header) {
+            printf "                Spell Total\n"
+            have_printed_working_spell_header = TRUE
+         }
+         printf "    %05s-%05s %5s %5s\n", project_start, working_spell_end, hours_minutes(working_spell), hours_minutes(day_project_total)
+      }
+   }
+   working_spell = 0
+   project_start = $TIME
+}
+
+function print_day_total() {
+   if (!have_printed_day_total_header) {
+      printf "                          Total   Project    Planned\n"
+      have_printed_day_total_header = TRUE
+   }
+   productive_percentage = 0
+   planned_percentage = 0
+   if (day_total > 0) {
+      productive_percentage = day_project_total / day_total * 100
+   }
+   if (day_project_total > 0) {
+      planned_percentage = day_planned_total / day_project_total * 100
+   }
+   printf "%8s                  %5s %5s %3i%% %5s %3i%%\n", date, hours_minutes(day_total), \
+            hours_minutes(day_project_total), productive_percentage, \
+            hours_minutes(day_planned_total), planned_percentage
+}
+
+function print_week_total() {
+   productive_percentage = 0
+   planned_percentage = 0
+   if (week_active_total > 0) {
+      productive_percentage = week_project_total / week_active_total * 100
+   }
+   if (week_project_total > 0) {
+      planned_percentage = week_planned_total / week_project_total * 100
+   }
+   printf "            Up to %5s - %5s %5s %3i%% %5s %3i%%\n", time_of_last_entry, hours_minutes(week_total), \
+            hours_minutes(week_project_total), productive_percentage, \
+            hours_minutes(week_planned_total), planned_percentage
+}
+
+function print_total_at_time(go_home_time) {
+   if (match(time_of_last_entry, ":") == 2) {
+      time_of_last_entry = "0" time_of_last_entry
+   }
+   if (time_of_last_entry < go_home_time) {
+      total_by_home_time = week_total + minutes_between(time_of_last_entry, go_home_time)
+      # If it isn't lunch-time yet, subtract 30 minutes
+      if (strftime("%H:%M") < "12:30") {
+         total_by_home_time = total_by_home_time - 30
+      }
+      printf "               By %s - %5s\n", go_home_time, hours_minutes(total_by_home_time)
+   }
+}
+
+#------------------------------------ Error handling ------------------------------------------------------------------
+
+function error(error_message) {
+   print "Line " FNR ": " error_message
+   error_number = 1
+   exit error_number
+}
+
+END {
+   if (error_number > 0) {
+      exit error_number
+   }
+}
+
+#------------------------------------ Output --------------------------------------------------------------------------
+
+END {
+   # Just have to print the day total for the last day - the others were printed as we went
+   print_working_spell()
+   print_day_total()
+   print ""
+   print_week_total()
+   print_total_at_time(go_home_time)
+}
+

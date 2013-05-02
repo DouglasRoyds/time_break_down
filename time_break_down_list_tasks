@@ -1,0 +1,43 @@
+#!/usr/bin/gawk -f
+# Compute planned time ratio as a percentage.
+# Excludes leave.
+# Usage:
+#
+#     for f in Archive/2012/*; do
+#        cat $f | time_break_down_task_times | time_break_down_list_tasks | sort -u | sed "s#.*#$f: &#"
+#     done
+
+BEGIN {
+   FS = "\t"
+   OFS = "\t"
+   TIME = 1
+   SUBTASK = 2
+   TASK = 3
+   PROJECT = 4
+   DATE = 5
+
+   TRUE = 1
+   FALSE = 0
+
+   error_number = 0
+
+   unplanned_tasks = "assist|spec|support|admin|mail|planning|computer|supervision|training|reading|procs|stuff"
+}
+
+($TASK ~ "^$|leave") {
+   next
+}
+
+($PROJECT ~ "non-project") {
+   next
+}
+
+($TASK ~ unplanned_tasks) {
+   next
+}
+
+# Everything else is planned project time
+{
+   print $TASK
+}
+

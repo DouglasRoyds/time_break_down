@@ -1,0 +1,19 @@
+#!/bin/bash
+# Same purpose as time_break_down_task_times, but weight the times,
+# taking out all non-project admin, mail, coffee, computer, etc.
+# Usage:
+#     cat Archive/2012/121026.txt | time_break_down_weighted_times
+
+tmpfile=$(mktemp)
+cat >$tmpfile
+
+# time_break_down_non_project_times outputs gawk commandline parameters of the form:
+#     --assign non_project_time=640
+#     --assign project_time=1150
+# These variables are passed into time_break_down_weighted_times.awk,
+# which weights all the task times from time_break_down_task_times accordingly,
+# outputting only the project tasks.
+cat $tmpfile |
+time_break_down_task_times |
+time_break_down_weighted_times.awk $(cat $tmpfile | time_break_down_task_times | time_break_down_non_project_times)
+

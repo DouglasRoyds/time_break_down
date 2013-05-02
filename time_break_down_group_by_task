@@ -1,0 +1,135 @@
+#!/usr/bin/gawk -f
+
+#------------------------------------ Initialisation ------------------------------------------------------------------
+
+BEGIN {
+   FS = "\t"
+   TIME = 1
+   SUBTASK = 2
+   TASK = 3
+   PROJECT = 4
+   DATE = 5
+
+   TRUE = 1
+   FALSE = 0
+   error_number = 0
+
+   first_line = FALSE
+   subtask_time = 0
+   task_time = 0
+   project_time = 0
+   total_time = 0
+}
+
+#------------------------------------ Line processing -----------------------------------------------------------------
+
+# Ignore private time
+($TASK == "") {
+                                    #print "Private time: " $0
+   next
+}
+
+(first_line == FALSE) {
+                                    #print "First line"
+   first_line = TRUE
+   subtask = $SUBTASK
+   new_project()
+   new_task()
+}
+
+(project != $PROJECT) {
+                                    #print "New project: " $PROJECT
+                                    #print
+   new_subtask()
+   print_task_total()
+   print_project_total()
+   new_project()
+   new_task()
+   increment_totals()
+   next
+}
+
+(task != $TASK) {
+                                    #print "New task: " $TASK
+   new_subtask()
+   print_task_total()
+   new_task()
+   increment_totals()
+   next
+}
+
+(subtask != $SUBTASK) {
+                                    #print "New subtask: " $SUBTASK
+   new_subtask()
+   increment_totals()
+   next
+}
+
+{
+   increment_totals()
+}
+
+END {
+   new_subtask()
+   print_task_total()
+   print_project_total()
+   printf "Total: %6s\n", hours_minutes(total_time)
+}
+
+#------------------------------------ Functions -----------------------------------------------------------------------
+
+function new_project() {
+   project = $PROJECT
+   printf "%s\n", project
+   project_time = 0
+}
+
+function print_project_total() {
+   if (project_time > 0) {
+      printf "       %6s\n", hours_minutes(project_time)
+   }
+}
+
+function new_task() {
+   task = $TASK
+   task_time = 0
+   printf "              %s\n", task
+}
+
+function print_task_total() {
+   printf "                   %5s\n", hours_minutes(task_time)
+}
+
+function new_subtask() {
+   printf    "                         %5s %s\n", hours_minutes(subtask_time), subtask
+   subtask = $SUBTASK
+   subtask_time = 0
+}
+
+function increment_totals() {
+   subtask_time += $TIME
+   task_time += $TIME
+   project_time += $TIME
+   total_time += $TIME
+}
+
+function hours_minutes(minutes) {
+   hours = int(minutes / 60)
+   minutes = minutes - (hours * 60)
+   return sprintf("%2i:%02i", hours, minutes)
+}
+
+#------------------------------------ Error handling ------------------------------------------------------------------
+
+function error(error_message) {
+   print "Line " FNR ": " error_message
+   error_number = 1
+   exit error_number
+}
+
+END {
+   if (error_number > 0) {
+      exit error_number
+   }
+}
+

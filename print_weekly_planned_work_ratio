@@ -1,0 +1,23 @@
+#!/bin/bash
+# Prints planned project tasks carried out each week
+# It is also enlightening to sort the output:
+#
+#  $ print_weekly_planned_work_ratio | sort -n
+
+if ! grep -q "/mnt/homehost/roydsd" <(mount); then
+   echo "//homehost/roydsd not mounted"
+fi
+
+for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{Archive/$(/bin/date +%Y)/*,Time_break-down.txt}; do
+   echo -n $(
+      cat $f |
+      time_break_down_task_times |
+      time_break_down_planned_ratio
+   )
+   echo -ne '\t'
+   echo $f | sed -e 's#.*/##' \
+                 -e 's#.txt$##' \
+                 -e 's#\([0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)#\1-\2-\3#'
+
+done
+

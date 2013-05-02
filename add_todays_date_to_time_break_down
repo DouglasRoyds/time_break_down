@@ -1,0 +1,5 @@
+#!/bin/bash
+if grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
+   date -d @`expr $(date +%s) / 300 \* 300` '+%H:%M%t--- %A ---%t%t%t%x' >> /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt
+fi
+

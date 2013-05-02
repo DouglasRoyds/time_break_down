@@ -1,0 +1,15 @@
+#!/bin/bash
+# Prints planned project tasks carried out each week
+
+if ! grep -q "/mnt/homehost/roydsd" <(mount); then
+   echo "//homehost/roydsd not mounted"
+fi
+
+for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{Archive/$(/bin/date +%Y)/*,Time_break-down.txt}; do
+   cat $f |
+   time_break_down_task_times |
+   time_break_down_list_tasks |
+   sort -u |
+   sed "s#.*#$(basename $f): &#"
+done
+

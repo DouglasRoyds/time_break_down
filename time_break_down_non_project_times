@@ -1,0 +1,45 @@
+#!/usr/bin/gawk -f
+# Compute project and non_project totals.
+# Output in --assign var=value form to be passed into another gawk invocation.
+# Excludes leave.
+# Usage:
+#     cat Archive/2012/121026.txt | time_break_down_task_times | time_break_down_non_project_times
+
+BEGIN {
+   FS = "\t"
+   OFS = "\t"
+   TIME = 1
+   SUBTASK = 2
+   TASK = 3
+   PROJECT = 4
+   DATE = 5
+
+   TRUE = 1
+   FALSE = 0
+
+   error_number = 0
+}
+
+($TASK == "") {
+   next
+}
+
+($TASK ~ "leave") {
+   next
+}
+
+($PROJECT ~ "non-project") {
+    non_project_time += $TIME
+    next
+}
+
+{
+    project_time += $TIME
+    next
+}
+
+END {
+    print "--assign non_project_time=" non_project_time
+    print "--assign project_time=" project_time
+}
+

@@ -1,0 +1,111 @@
+#!/usr/bin/gawk -f
+
+#------------------------------------ Initialisation ------------------------------------------------------------------
+
+BEGIN {
+   FS = "\t"
+   OFS = "\t"
+   TIME = 1
+   SUBTASK = 2
+   TASK = 3
+   PROJECT = 4
+   DATE = 5
+
+   TRUE = 1
+   FALSE = 0
+
+   # Non-project tasks that are to be accounted for completely separately
+   # A regular expression
+   strictly_non_project_tasks = "leave"
+
+   start_time = "00:00"
+   error_number = 0
+}
+
+#------------------------------------ Line processing -----------------------------------------------------------------
+
+# Ignore the .LOG line
+/\.LOG/ {
+   next
+}
+
+# Ignore blank lines
+/^$/ {
+   print "Blank line"
+   next
+}
+
+# Ignore lines with no time entry - that is, lines starting with a tab
+/^\t/ {
+   print "Line with no time entry: " $0
+   next
+}
+
+{
+   # TODO: Add a time-going-backwards check here
+   task_time = minutes_between(start_time, $TIME)
+   start_time = $TIME
+                                             #print
+}
+
+# New day
+$DATE != "" {
+                                             #print "New day"
+   next
+}
+
+($TASK ~ strictly_non_project_tasks) {
+   $PROJECT = $TASK
+}
+
+# Non-project
+($PROJECT == "") {
+   $PROJECT = "non-project"
+}
+
+{
+   $TIME = task_time
+   print
+}
+
+#------------------------------------ Functions -----------------------------------------------------------------------
+
+function minutes_between(start_time, end_time) {
+   if (split(start_time, start, ":") != 2) {
+      error("Not a valid time: " start_time)
+   }
+   if (split(end_time, end, ":") != 2) {
+      error("Not a valid time: " end_time)
+   }
+
+   hours = end[1] - start[1]
+   minutes = end[2] - start [2]
+   if (minutes < 0) {
+      minutes = minutes + 60
+      hours = hours - 1
+   }
+   total = hours * 60 + minutes
+   #print "Hours: " hours "  Minutes: " minutes "  Total: " total
+   return total
+}
+
+function hours_minutes(minutes) {
+   hours = int(minutes / 60)
+   minutes = minutes - (hours * 60)
+   return sprintf("%2i:%02i", hours, minutes)
+}
+
+#------------------------------------ Error handling ------------------------------------------------------------------
+
+function error(error_message) {
+   print "Line " FNR ": " error_message
+   error_number = 1
+   exit error_number
+}
+
+END {
+   if (error_number > 0) {
+      exit error_number
+   }
+}
+

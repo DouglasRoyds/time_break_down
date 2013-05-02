@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
+   cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{Archive/$(/bin/date +%Y)/*,Time_break-down.txt} \
+      | analyse_time_break_down
+else
+   echo "//homehost/roydsd not mounted"
+fi
+

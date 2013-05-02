@@ -1,0 +1,12 @@
+#!/bin/bash
+# Prints planned work ratio for the whole year to date.
+# Excludes leave.
+
+if ! grep -q "/mnt/homehost/roydsd" <(mount); then
+   echo "//homehost/roydsd not mounted"
+fi
+
+cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{Archive/$(/bin/date +%Y)/*,Time_break-down.txt} |
+time_break_down_task_times |
+time_break_down_planned_ratio
+
