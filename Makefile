@@ -25,5 +25,5 @@ install:
 	@install -v -m664 $(docfiles) $(DESTDIR)$(docdir)
 
 checkinstall:
-	sudo checkinstall --pkgname=$(PACKAGE) --nodoc
+	checkinstall --pkgname=$(PACKAGE) --nodoc
 
