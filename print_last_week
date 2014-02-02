@@ -6,5 +6,5 @@ if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
 fi
 
 last_week_time_break_down=$(ls -t /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Archive/$(date +'%Y')/* | head -1)
-cat $last_week_time_break_down | analyse_time_break_down
+cat $last_week_time_break_down | analyse_time_break_down | less
 
