@@ -1,5 +1,7 @@
 #!/bin/bash
 
+(
+
 if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
    echo "//homehost/roydsd not mounted"
    exit 1
@@ -59,7 +61,7 @@ echo
 
 echo "------------------- Week so far -------------------------------"
 
-analyse_time_break_down < Time_break-down.txt 
+analyse_time_break_down < Time_break-down.txt
 echo
 
 echo "------------------- Year so far -------------------------------"
@@ -68,4 +70,6 @@ cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Archive/$(date +'%Y')/* \
     /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt \
     | analyse_time_break_down
 echo
+
+) | less
 
