@@ -5,6 +5,8 @@ if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
    exit 1
 fi
 
+(
+
 echo "------------------- Daily hours -------------------------------"
 
 analyse_daily_hours < /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt
@@ -56,4 +58,6 @@ echo
 echo "------------------- Week so far -------------------------------"
 
 cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt | analyse_time_break_down_weighted
+
+) | less
 

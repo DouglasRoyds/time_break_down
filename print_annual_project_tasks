@@ -11,5 +11,5 @@ for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{Archive/$(/bin/date +%
    time_break_down_list_tasks |
    sort -u |
    sed "s#.*#$(basename $f): &#"
-done
+done | less
 
