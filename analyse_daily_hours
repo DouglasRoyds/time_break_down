@@ -4,7 +4,7 @@
 
 BEGIN {
    go_home_time = "18:00"
-   unplanned_tasks = "assist spec support admin mail planning computer supervision training reading procs stuff"
+   unplanned_tasks = "assist spec support admin mail planning computer supervision training reading procs stuff vim"
 
    FS = "\t"
    TIME = 1
