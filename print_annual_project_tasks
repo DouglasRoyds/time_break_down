@@ -5,7 +5,7 @@ if ! grep -q "/mnt/homehost/roydsd" <(mount); then
    echo "//homehost/roydsd not mounted"
 fi
 
-for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{Archive/$(/bin/date +%Y)/*,Time_break-down.txt}; do
+for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{archive/$(/bin/date +%Y)/*,Time_break-down.txt}; do
    cat $f |
    time_break_down_task_times |
    time_break_down_list_tasks |
