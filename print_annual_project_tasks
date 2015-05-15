@@ -1,11 +1,13 @@
 #!/bin/bash
-# Prints planned project tasks carried out each week
+# Prints planned project tasks carried out each week.
+# Accepts one optional argument, being the year to print.
 
 if ! grep -q "/mnt/homehost/roydsd" <(mount); then
    echo "//homehost/roydsd not mounted"
 fi
 
-for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{archive/$(/bin/date +%Y)/*,Time_break-down.txt}; do
+year=${1:-$(/bin/date +%Y)}
+for f in /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/{archive/$year/*,Time_break-down.txt}; do
    cat $f |
    time_break_down_task_times |
    time_break_down_list_tasks |
