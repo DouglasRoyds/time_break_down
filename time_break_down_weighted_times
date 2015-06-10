@@ -2,7 +2,7 @@
 # Same purpose as time_break_down_task_times, but weight the times,
 # taking out all non-project admin, mail, coffee, computer, etc.
 # Usage:
-#     cat Archive/2012/121026.txt | time_break_down_weighted_times
+#     cat archive/2012/121026.txt | time_break_down_weighted_times
 
 tmpfile=$(mktemp)
 cat >$tmpfile

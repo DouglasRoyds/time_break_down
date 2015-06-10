@@ -3,7 +3,7 @@
 # Excludes leave.
 # Usage:
 #
-#     for f in Archive/2012/*; do
+#     for f in archive/2012/*; do
 #        cat $f | time_break_down_task_times | time_break_down_list_tasks | sort -u | sed "s#.*#$f: &#"
 #     done
 

@@ -14,7 +14,7 @@ echo
 
 echo "------------------- Last working day --------------------------"
 
-last_days_files="$(ls -t /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Archive/$(date +'%Y')/* | head -1) \
+last_days_files="$(ls -t /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/archive/$(date +'%Y')/* | head -1) \
                          /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt"
 
 yesterday=$(cat $last_days_files \

@@ -18,7 +18,7 @@ echo
 
 echo "------------------- Last working day --------------------------"
 
-last_days_files="$(ls -t Archive/$(date +'%Y')/* | head -1) \
+last_days_files="$(ls -t archive/$(date +'%Y')/* | head -1) \
                          Time_break-down.txt"
 
 yesterday=$(cat $last_days_files \
@@ -66,7 +66,7 @@ echo
 
 echo "------------------- Year so far -------------------------------"
 
-cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Archive/$(date +'%Y')/* \
+cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/archive/$(date +'%Y')/* \
     /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/Time_break-down.txt \
     | analyse_time_break_down
 echo

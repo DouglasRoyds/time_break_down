@@ -3,7 +3,7 @@
 # Output in --assign var=value form to be passed into another gawk invocation.
 # Excludes leave.
 # Usage:
-#     cat Archive/2012/121026.txt | time_break_down_task_times | time_break_down_non_project_times
+#     cat archive/2012/121026.txt | time_break_down_task_times | time_break_down_non_project_times
 
 BEGIN {
    FS = "\t"

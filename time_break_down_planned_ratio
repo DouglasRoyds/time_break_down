@@ -3,9 +3,9 @@
 # Excludes leave.
 # Usage:
 #
-#     cat Archive/2012/* | time_break_down_task_times | time_break_down_planned_ratio
+#     cat archive/2012/* | time_break_down_task_times | time_break_down_planned_ratio
 #
-#     for f in Archive/2012/*; do
+#     for f in archive/2012/*; do
 #        cat $f | time_break_down_task_times | time_break_down_planned_ratio
 #     done | sort -n
 
