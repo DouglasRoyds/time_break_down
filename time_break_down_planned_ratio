@@ -23,7 +23,7 @@ BEGIN {
 
    error_number = 0
 
-   unplanned_tasks = "assist|spec|support|admin|mail|planning|computer|supervision|training|reading|procs|stuff|vim"
+   unplanned_tasks = "assist|spec|support|admin|mail|planning|computer|supervision|training|reading|procs|stuff|vim|jenkins"
 }
 
 ($TASK ~ "^$|leave") {
