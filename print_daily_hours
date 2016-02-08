@@ -64,6 +64,12 @@ echo "------------------- Week so far -------------------------------"
 analyse_time_break_down < Time_break-down.txt
 echo
 
+echo "------------------- Last week ---------------------------------"
+
+last_week=$(ls -t archive/$(date +'%Y')/* | head -1)
+analyse_time_break_down < $last_week
+echo
+
 echo "------------------- Year so far -------------------------------"
 
 cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/archive/$(date +'%Y')/* \
