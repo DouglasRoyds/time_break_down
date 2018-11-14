@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
+   echo "//homehost/roydsd not mounted"
+   exit 1
+fi
+
+last_week_time_break_down=$(ls /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/archive/$(date +'%Y')/* | sort | tail -n1)
+cat $last_week_time_break_down | analyse_daily_hours | less
+
