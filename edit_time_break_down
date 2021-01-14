@@ -9,7 +9,9 @@ if ! grep "$mountdir" <(mount) >/dev/null; then
    exit 1
 fi
 
-if timeout3 -t9 sh -c "date -d @$(expr \( $(date +%s) + 150 \) / 300 \* 300) '+%H:%M%t%x' >> $breakdown_file"
+if timeout -k1 9 sh <<__EOF__
+   date -d @$(expr \( $(date +%s) + 150 \) / 300 \* 300) '+%H:%M%t%x' >> $breakdown_file
+__EOF__
 then
    cd "$breakdown_dir"
    vim -c 'set noexpandtab hlsearch tabstop=8 softtabstop=0' "$breakdown_file"
