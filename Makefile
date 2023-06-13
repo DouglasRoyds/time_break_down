@@ -14,8 +14,11 @@ docfiles = $(wildcard *.md)
 
 help:
 	@echo "An install-only makefile to allow easy running of checkinstall:"
+	@echo
 	@echo "   $$ sudo make checkinstall"
+	@echo
 	@echo "Installs the following scripts:"
+	@echo
 	@echo -n "   "; echo $(scriptfiles) | sed 's# \+#\n   #g'
 
 install:
