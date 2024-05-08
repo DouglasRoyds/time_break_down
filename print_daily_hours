@@ -66,7 +66,7 @@ echo
 
 echo "------------------- Last week ---------------------------------"
 
-last_week=$(ls -t archive/$(date +'%Y')/* | head -1)
+last_week=$(ls -t archive/$(date +'%Y')/* | sort | tail -1)
 analyse_time_break_down < $last_week
 echo
 
