@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
+   echo "//homehost/roydsd not mounted"
+   exit 1
+fi
+
+this_year=$(\date +%Y)
+year=$(($this_year - 4))
+while [ $((year++)) -lt $this_year ]; do
+   cat /mnt/homehost/roydsd/Tait/Hours_and_time-sheets/archive/$year/*
+done |
+   analyse_time_break_down_weighted | less
+
