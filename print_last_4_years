@@ -1,7 +1,10 @@
 #!/bin/bash
 
-if ! grep "/mnt/homehost/roydsd" <(mount) >/dev/null; then
-   echo "//homehost/roydsd not mounted"
+mountdir="/mnt/homehost/roydsd"
+time_sheets="$mountdir/Tait/Hours_and_time-sheets"
+
+if ! grep "$mountdir" <(mount) >/dev/null; then
+   echo "$mountdir not mounted"
    exit 1
 fi
 
